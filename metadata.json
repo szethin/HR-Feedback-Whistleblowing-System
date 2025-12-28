@@ -1,0 +1,5 @@
+{
+  "name": "HR Feedback & Whistleblowing System",
+  "description": "A secure, minimal web application for managing employee grievances with strict role-based access control.",
+  "requestFramePermissions": []
+}
