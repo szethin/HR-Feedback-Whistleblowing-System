@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User } from '../types';
-import { mockApi } from '../services/mockApi';
+import { api } from '../services/api';
 import { Lock, Mail, Loader2 } from 'lucide-react';
 
 interface LoginProps {
@@ -19,7 +19,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setIsLoading(true);
 
     try {
-      const user = await mockApi.login(email, password);
+      const user = await api.login(email, password);
       onLogin(user);
     } catch (err) {
       setError('Invalid email or password. Try employee@test.com / password');
