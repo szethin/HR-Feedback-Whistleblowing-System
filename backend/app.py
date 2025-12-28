@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+from werkzeug.security import generate_password_hash, check_password_hash
 import pyodbc
 import os
 from dotenv import load_dotenv
@@ -26,7 +27,7 @@ def ping():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# NEW: Login endpoint
+# Login with password validation
 @app.route("/api/auth/login", methods=["POST"])
 def login():
     try:
@@ -34,24 +35,32 @@ def login():
         email = data.get("email")
         password = data.get("password")
         
+        if not email or not password:
+            return jsonify({"error": "Email and password required"}), 400
+        
         conn = get_conn()
         cur = conn.cursor()
-        cur.execute("SELECT employee_id, name, email, role FROM users WHERE email = ?", email)
+        cur.execute("SELECT employee_id, name, email, password_hash, role FROM users WHERE email = ?", email)
         row = cur.fetchone()
         conn.close()
         
-        if row:
-            return jsonify({
-                "employee_id": row[0],
-                "name": row[1],
-                "email": row[2],
-                "role": row[3]
-            }), 200
-        return jsonify({"error": "Invalid credentials"}), 401
+        if not row:
+            return jsonify({"error": "Invalid credentials"}), 401
+        
+        # Check password hash
+        stored_hash = row[3]
+        if not check_password_hash(stored_hash, password):
+            return jsonify({"error": "Invalid credentials"}), 401
+        
+        return jsonify({
+            "employee_id": row[0],
+            "name": row[1],
+            "email": row[2],
+            "role": row[4]
+        }), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# GET all grievances (admin) or user's grievances
 @app.route("/api/grievances", methods=["GET"])
 def list_grievances():
     try:
@@ -74,7 +83,6 @@ def list_grievances():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# POST new grievance
 @app.route("/api/grievances", methods=["POST"])
 def create_grievance():
     try:
@@ -89,7 +97,6 @@ def create_grievance():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# UPDATE grievance status (admin only)
 @app.route("/api/grievances/<int:grievance_id>", methods=["PUT"])
 def update_grievance(grievance_id):
     try:
