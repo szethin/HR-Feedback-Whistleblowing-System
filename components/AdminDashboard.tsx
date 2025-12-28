@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, Grievance, GrievanceStatus } from '../types';
-import { mockApi } from '../services/mockApi';
+import { api } from '../services/api';
 import { Loader2, Trash2, Save, Filter } from 'lucide-react';
 
 interface AdminDashboardProps {
@@ -18,7 +18,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
   const fetchGrievances = async () => {
     setIsLoading(true);
     try {
-      const data = await mockApi.getGrievances(user);
+      const data = await api.getGrievances(user);
       setGrievances(data);
     } catch (err) {
       console.error(err);
@@ -34,7 +34,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
   const handleStatusChange = async (id: number, newStatus: GrievanceStatus) => {
     setEditingId(id);
     try {
-      await mockApi.updateStatus(id, newStatus);
+      await api.updateStatus(id, newStatus);
       // Optimistic update
       setGrievances(prev => prev.map(g => g.grievance_id === id ? { ...g, status: newStatus } : g));
     } catch (err) {
@@ -51,7 +51,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ user }) => {
     
     setEditingId(id);
     try {
-      await mockApi.deleteGrievance(id);
+      await api.deleteGrievance(id);
       setGrievances(prev => prev.filter(g => g.grievance_id !== id));
     } catch (err) {
       console.error('Failed to delete grievance');

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { User } from '../types';
-import { mockApi } from '../services/mockApi';
+import { api } from '../services/api';
 import { Lock, Mail, Loader2 } from 'lucide-react';
 
 interface LoginProps {
@@ -19,10 +19,10 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     setIsLoading(true);
 
     try {
-      const user = await mockApi.login(email, password);
+      const user = await api.login(email, password);
       onLogin(user);
     } catch (err) {
-      setError('Invalid email or password. Try employee@test.com / password');
+      setError('Invalid email or password.');
     } finally {
       setIsLoading(false);
     }
@@ -85,17 +85,6 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         </button>
       </form>
 
-      <div className="mt-6 p-4 bg-gray-50 rounded text-xs text-gray-500 space-y-1">
-        <p className="font-semibold">Demo Credentials:</p>
-        <div className="flex justify-between">
-          <span>Employee:</span>
-          <span className="font-mono">employee@test.com / password</span>
-        </div>
-        <div className="flex justify-between">
-          <span>HR Admin:</span>
-          <span className="font-mono">admin@test.com / password</span>
-        </div>
-      </div>
     </div>
   );
 };

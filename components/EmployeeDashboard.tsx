@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { User, Grievance, GrievanceStatus } from '../types';
-import { mockApi } from '../services/mockApi';
+import { api } from '../services/api';
 import { Plus, List, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
 
 interface EmployeeDashboardProps {
@@ -23,7 +23,7 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user }) => {
   const fetchGrievances = async () => {
     setIsLoading(true);
     try {
-      const data = await mockApi.getGrievances(user);
+      const data = await api.getGrievances(user);
       setGrievances(data);
     } catch (err) {
       console.error(err);
@@ -48,7 +48,7 @@ const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({ user }) => {
     setError('');
     setIsSubmitting(true);
     try {
-      await mockApi.createGrievance(user, { title, description, acceptedTerms });
+      await api.createGrievance(user, { title, description, acceptedTerms });
       setSubmitSuccess(true);
       setTitle('');
       setDescription('');
