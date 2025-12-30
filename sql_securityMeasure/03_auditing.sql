@@ -1,0 +1,47 @@
+-- Step 1: Create Server Audit
+USE master;
+GO
+
+CREATE SERVER AUDIT HRFeedback_ServerAudit
+TO FILE 
+(
+    FILEPATH = 'C:\SQLAudit\',
+    MAXSIZE = 100 MB,
+    MAX_ROLLOVER_FILES = 5,
+    RESERVE_DISK_SPACE = OFF
+)
+WITH (QUEUE_DELAY = 1000, ON_FAILURE = CONTINUE);
+GO
+
+ALTER SERVER AUDIT HRFeedback_ServerAudit
+WITH (STATE = ON);
+GO
+
+
+-- Step 2: Create Server Audit Specification
+
+CREATE SERVER AUDIT SPECIFICATION HRFeedback_ServerAuditSpec
+FOR SERVER AUDIT HRFeedback_ServerAudit
+ADD (FAILED_LOGIN_GROUP),
+ADD (SUCCESSFUL_LOGIN_GROUP);
+GO
+
+ALTER SERVER AUDIT SPECIFICATION HRFeedback_ServerAuditSpec
+WITH (STATE = ON);
+GO
+
+
+-- Step 3: Create Database Audit Specification
+
+USE HRFeedbackDB;
+GO
+
+CREATE DATABASE AUDIT SPECIFICATION HRFeedback_DBAuditSpec
+FOR SERVER AUDIT HRFeedback_ServerAudit
+ADD (SELECT, INSERT, UPDATE, DELETE ON dbo.grievances BY PUBLIC),
+ADD (SELECT ON dbo.users BY PUBLIC);
+GO
+
+ALTER DATABASE AUDIT SPECIFICATION HRFeedback_DBAuditSpec
+WITH (STATE = ON);
+GO
