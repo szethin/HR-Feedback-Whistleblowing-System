@@ -44,6 +44,10 @@ export const api = {
   },
 
   deleteGrievance: async (grievanceId: number): Promise<void> => {
-    throw new Error('Delete not yet implemented');
+    const res = await fetch(`${API_BASE}/api/grievances/${grievanceId}`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    if (!res.ok) throw new Error('Failed to delete grievance');
   }
 };

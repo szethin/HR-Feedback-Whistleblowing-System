@@ -52,11 +52,15 @@ def login():
         if not check_password_hash(stored_hash, password):
             return jsonify({"error": "Invalid credentials"}), 401
         
+        # Convert database role to frontend enum
+        db_role = row[4]
+        frontend_role = "HR Admin" if db_role == "ADMIN" else "Employee"
+        
         return jsonify({
             "employee_id": row[0],
             "name": row[1],
             "email": row[2],
-            "role": row[4]
+            "role": frontend_role
         }), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -70,7 +74,7 @@ def list_grievances():
         conn = get_conn()
         cur = conn.cursor()
         
-        if role == "ADMIN":
+        if role == "HR Admin":
             cur.execute("SELECT grievance_id, employee_id, title, description, status, created_at FROM grievances ORDER BY created_at DESC")
         else:
             cur.execute("SELECT grievance_id, employee_id, title, description, status, created_at FROM grievances WHERE employee_id = ? ORDER BY created_at DESC", employee_id)
@@ -104,6 +108,18 @@ def update_grievance(grievance_id):
         conn = get_conn()
         cur = conn.cursor()
         cur.execute("UPDATE grievances SET status = ? WHERE grievance_id = ?", data.get("status"), grievance_id)
+        conn.commit()
+        conn.close()
+        return jsonify({"ok": True}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/grievances/<int:grievance_id>", methods=["DELETE"])
+def delete_grievance(grievance_id):
+    try:
+        conn = get_conn()
+        cur = conn.cursor()
+        cur.execute("DELETE FROM grievances WHERE grievance_id = ?", grievance_id)
         conn.commit()
         conn.close()
         return jsonify({"ok": True}), 200
