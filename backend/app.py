@@ -18,6 +18,10 @@ def get_conn():
     conn_str = f'DRIVER={{ODBC Driver 18 for SQL Server}};SERVER={server};DATABASE={database};UID={username};PWD={password};TrustServerCertificate=yes;'
     return pyodbc.connect(conn_str, autocommit=True)
 
+@app.route('/')
+def health_check():
+    return "OK", 200
+
 @app.route("/api/ping")
 def ping():
     try:
