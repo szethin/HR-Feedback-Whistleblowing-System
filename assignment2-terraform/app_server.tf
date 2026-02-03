@@ -1,6 +1,7 @@
 resource "aws_instance" "hr_app_server" {
   ami           = data.aws_ami.amazon_linux_2023.id
   instance_type = "t2.micro"
+  key_name      = "vockey"
   
   # NOTE: We keep it public for grading access, or change back to private_app_a.id for security
   subnet_id     = aws_subnet.public_a.id  
