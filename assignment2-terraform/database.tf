@@ -17,6 +17,12 @@ resource "aws_instance" "hr_database" {
 
   tags = { Name = "HR-Database" }
 
+  root_block_device {
+    volume_size = 15
+    volume_type = "gp3"
+    encrypted   = true 
+  }
+
   # Install Docker & SQL Server automatically
   user_data = <<-EOF
               #!/bin/bash

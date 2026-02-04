@@ -13,6 +13,12 @@ resource "aws_instance" "hr_app_server" {
   tags = { Name = "HR-App-Server" }
   depends_on = [aws_instance.hr_database]
 
+  root_block_device {
+    volume_size = 8
+    volume_type = "gp3"
+    encrypted   = true 
+  }
+
   user_data = <<-EOF
               #!/bin/bash
               # 1. Disable SELinux & Firewall Restrictions (Fixes 502/504 Errors)
